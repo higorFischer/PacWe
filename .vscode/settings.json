@@ -1,0 +1,24 @@
+{
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"editor.formatOnSave": true,
+	"editor.codeActionsOnSave": {
+		"source.fixAll": true,
+		"mode": "all"
+	},
+	"vetur.format.options.useTabs": true,
+	"prettier.useTabs": true,
+	"prettier.tabWidth": 4,
+	"prettier.enable": true,
+	"cSpell.words": [
+		"bgcolor",
+		"clsx",
+		"Dropzone",
+		"Highcharts",
+		"Horiz",
+		"Leftbar",
+		"luxon",
+		"selecteds",
+		"semilogo",
+		"Subproduct"
+	]
+}
