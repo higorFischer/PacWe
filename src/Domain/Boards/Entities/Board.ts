@@ -20,10 +20,19 @@ export class Board extends Entity {
 		return this.tiles[position.x][position.y];
 	}
 
+	isInsideHorizontaly(position: Position) {
+		return position.x < this.xLimit && position.x >= 0;
+	}
+
+	isInsideVerticaly(position: Position) {
+		return position.y < this.yLimit && position.y >= 0;
+	}
+
 	isInside(position: Position) {
-		const isInsideHorizontaly = position.x < this.xLimit && position.x >= 0;
-		const isInsideVerticaly = position.y < this.yLimit && position.y >= 0;
-		return isInsideHorizontaly && isInsideVerticaly;
+		return (
+			this.isInsideHorizontaly(position) &&
+			this.isInsideVerticaly(position)
+		);
 	}
 
 	isPointObject(position: Position) {
@@ -36,5 +45,9 @@ export class Board extends Entity {
 
 	constructor(public tiles: Tile[][]) {
 		super();
+	}
+
+	public static empty() {
+		return new Board([]);
 	}
 }

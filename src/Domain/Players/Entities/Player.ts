@@ -15,4 +15,8 @@ export class Player extends Entity {
 	public static create(x: number, y: number) {
 		return new Player(x, y);
 	}
+
+	public static empty() {
+		return new Player(0, 0);
+	}
 }

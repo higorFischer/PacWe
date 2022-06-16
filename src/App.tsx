@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import p5 from "p5";
 import { Board } from "./Domain/Boards/Entities/Board";
 import { Player } from "./Domain/Players/Entities/Player";
@@ -9,17 +9,37 @@ import { board1 } from "./Boards/stringBoards";
 import { BoardScketcher } from "./Drawings/BoardSketcher";
 import { PlayerSketcher } from "./Drawings/PlayerSketcher";
 import { PlayerStatus } from "./Domain/Players/Enums/PlayerStatus";
+import useWebSocket from "react-use-websocket";
+import { create } from "domain";
+
+var board!: Board;
+var players!: Player[];
+var player!: Player;
 
 function App() {
 	const ref = useRef<any>();
 
-	var board!: Board;
-	var players!: Player[];
-	var capture: any;
-
 	var boardScketcher = new BoardScketcher();
 	var playerSketcher = new PlayerSketcher();
-	var playerMover = new PlayerMover();
+
+	const ws = useWebSocket("ws://localhost:8998", {
+		onOpen: (c) => {
+			console.log(`Connected to App WS`);
+		},
+		onMessage: (m) => {
+			board = Object.assign(Board.empty(), JSON.parse(m.data).board);
+			players = Object.assign([], JSON.parse(m.data).players);
+
+			if (!player)
+				player = Object.assign(Player.empty(), JSON.parse(m.data).self);
+		},
+		queryParams: { token: "123456" },
+		onError: (event) => {
+			console.error(event);
+		},
+		shouldReconnect: (closeEvent) => true,
+		reconnectInterval: 3000,
+	});
 
 	const Sketch = (p: p5) => {
 		p.preload = () => {};
@@ -30,13 +50,6 @@ function App() {
 
 			p!.background(160, 150, 125, 100);
 			p.createCanvas(width, height);
-
-			board = BoardBuilder.create(board1);
-			// capture = p.createCapture(p.VIDEO);
-			// capture.hide();
-			players = [Player.create(1, 1)];
-			console.log(board);
-			console.log(players);
 		};
 
 		p.draw = () => {
@@ -44,29 +57,24 @@ function App() {
 			playerSketcher.draw(p, players);
 
 			p.keyPressed = (e: any) => {
-				var newPosition = playerMover.moveByKey(players[0], e.code);
-				var movement = BoardMovementVerifier.verify(board, newPosition);
-
-				if (movement.canMove) {
-					players[0].position = newPosition;
-
-					if (movement.points && movement.points > 0)
-						players[0].points += movement.points;
-
-					if (movement.isPowerUp)
-						players[0].status = PlayerStatus.GODMODE;
-				}
-				console.log(players[0].points);
+				ws.sendMessage(
+					JSON.stringify({
+						self: player,
+						type: "MOVE",
+						key: e.code,
+					})
+				);
 			};
 		};
 	};
 
-	useEffect(() => {
+	const create = () => {
 		new p5(Sketch, ref.current);
-	}, []);
+	};
 
 	return (
 		<div style={{ display: "flex" }}>
+			<button onClick={create}>Connect</button>
 			<div ref={ref} />
 		</div>
 	);
