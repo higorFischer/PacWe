@@ -11,6 +11,7 @@ export class PlayerSketcher {
 				player.position.y * 30 + 15,
 				25
 			);
+
 			if (capture)
 				p.image(
 					capture,

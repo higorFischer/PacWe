@@ -5,19 +5,26 @@ import { Player } from "./Domain/Players/Entities/Player";
 import { BoardScketcher } from "./Drawings/BoardSketcher";
 import { PlayerSketcher } from "./Drawings/PlayerSketcher";
 import { io } from "socket.io-client";
+import { ImageSquare } from "./Components/ImageSquare";
+import { Buffer } from "buffer";
+var dgram = require("chrome-dgram");
+var sock = dgram.createSocket("udp4");
 
 var board!: Board;
 var players!: Player[];
 var player!: Player;
 
-function App() {
-	const [videoSocket, useVideoSocket] = useState(
-		io("wss://pacweserver.herokuapp.com")
-		// io("ws://localhost:3001")
-		// io("ws://localhost:8000")
-	);
+var socket: any = null;
+const fetchSocket = () => {
+	if (!socket) socket = io("ws://localhost:3001");
+	return socket;
+};
 
-	const ws = new WebSocket("wss://localhost:8000");
+function App() {
+	const [videoSocket, useVideoSocket] = useState(fetchSocket());
+	// io("wss://pacweserver.herokuapp.com")
+
+	// io("ws://localhost:8000")
 
 	const ref = useRef<any>();
 	const videoRef = useRef<any>();
@@ -61,6 +68,14 @@ function App() {
 		});
 	});
 
+	videoSocket.on("disconnected", (d: any) => {
+		setVideos((videos: any) => {
+			const v = { ...videos };
+			delete v[d];
+			return v;
+		});
+	});
+
 	function Draw(video: any, context: any) {
 		context?.drawImage(video, 0, 0, context.width, context.height);
 		videoSocket.emit("video", canvasRef.current.toDataURL("image/webp"));
@@ -75,30 +90,31 @@ function App() {
 	}
 
 	useEffect(() => {
-		// navigator.mediaDevices.getUserMedia =
-		// 	navigator.mediaDevices.getUserMedia ||
-		// 	(navigator.mediaDevices as any)?.webkitGetUserMedia ||
-		// 	(navigator.mediaDevices as any)?.mozGetUserMedia ||
-		// 	(navigator.mediaDevices as any)?.msgGetUserMedia;
-		// if (navigator.mediaDevices.getUserMedia) {
-		// 	navigator.mediaDevices
-		// 		.getUserMedia({
-		// 			video: true,
-		// 			audio: false,
-		// 		})
-		// 		.then((stream) => {
-		// 			loadCamera(stream);
-		// 		});
-		// }
-		// canvasRef.current.width = 200;
-		// canvasRef.current.height = 200;
-		// const video = videoRef.current;
-		// const context = canvasRef.current.getContext("2d");
-		// context.width = 200;
-		// context.height = 200;
-		// setInterval(function () {
-		// 	Draw(video, context);
-		// }, 1000);
+		navigator.mediaDevices.getUserMedia =
+			navigator.mediaDevices.getUserMedia ||
+			(navigator.mediaDevices as any)?.webkitGetUserMedia ||
+			(navigator.mediaDevices as any)?.mozGetUserMedia ||
+			(navigator.mediaDevices as any)?.msgGetUserMedia;
+		if (navigator.mediaDevices.getUserMedia) {
+			navigator.mediaDevices
+				.getUserMedia({
+					video: true,
+					audio: false,
+				})
+				.then((stream) => {
+					loadCamera(stream);
+				});
+		}
+		canvasRef.current.width = 200;
+		canvasRef.current.height = 200;
+		const video = videoRef.current;
+		const context = canvasRef.current.getContext("2d");
+		context.width = 200;
+		context.height = 200;
+
+		setInterval(function () {
+			Draw(video, context);
+		}, 1000);
 	}, []);
 
 	const Sketch = (p: p5) => {
@@ -113,8 +129,9 @@ function App() {
 		};
 
 		p.draw = () => {
+			console.log(videos);
 			boardScketcher.draw(p, board);
-			playerSketcher.draw(p, players, videos[0]);
+			playerSketcher.draw(p, players);
 
 			p.keyPressed = (e: any) => {
 				videoSocket.emit(
@@ -138,21 +155,47 @@ function App() {
 	};
 
 	return (
-		<div style={{ display: "flex" }}>
-			{/* <video ref={videoRef} autoPlay muted height={200} width={200} />
-			<div>DEVESAOss</div>
-			{videos &&
-				Object.keys(videos).map((videoKey: any) => {
-					return (
-						<ImageSquare key={videoKey} data={videos[videoKey]} />
-					);
-				})}
-			*/}
-			<canvas ref={canvasRef} style={{ display: "none" }} id="preview" />
+		<div
+			style={{
+				display: "flex",
+				flexDirection: "column",
+				width: "100vw",
+				height: "100vh",
+				margin: 0,
+				padding: 0,
+				backgroundColor: "#333",
+			}}
+		>
+			<div className="buttons">
+				<button className="button" onClick={create}>
+					Connect
+				</button>
+				<button className="button" onClick={reset}>
+					Reset
+				</button>
+			</div>
+			<div className="game">
+				<video ref={videoRef} autoPlay muted height={0} width={0} />
+				<div style={{ display: "flex" }}>
+					{videos &&
+						Object.keys(videos).map((videoKey: any) => {
+							return (
+								<ImageSquare
+									key={videoKey}
+									data={videos[videoKey]}
+								/>
+							);
+						})}
+				</div>
 
-			<button onClick={create}>Connect</button>
-			<button onClick={reset}>Reset</button>
-			<div ref={ref} />
+				<canvas
+					ref={canvasRef}
+					style={{ display: "none" }}
+					id="preview"
+				/>
+
+				<div ref={ref} />
+			</div>
 		</div>
 	);
 }

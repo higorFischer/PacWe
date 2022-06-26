@@ -1,0 +1,36 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+
+.buttons {
+	background-color: "green";
+	width: "100vw";
+	display: "flex";
+	height: 50px;
+	padding-top: 20px;
+}
+
+.button {
+	height: 200;
+	margin-left: 20px;
+	padding: 20px;
+}
+
+.game {
+	width: 100vw;
+	background-color: green;
+	margin: auto auto;
+	display: flex;
+	justify-content: space-around;
+}
+
+.game canvas {
+	background-color: red;
+}
+
+img {
+	border-radius: 50%;
+	border: 2px solid black;
+	margin-left: 10px;
+}
