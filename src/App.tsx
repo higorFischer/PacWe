@@ -37,7 +37,7 @@ function App() {
 		console.log("Connected to Pacwe Server");
 	});
 
-	videoSocket.on("gameaction", (m) => {
+	videoSocket.on("gameaction", (m: any) => {
 		const obj = JSON.parse(m);
 		if (!board) new p5(Sketch, ref.current);
 
@@ -49,7 +49,7 @@ function App() {
 		if (!player) player = Object.assign(Player.empty(), obj.self);
 	});
 
-	videoSocket.on("gameinit", (m) => {
+	videoSocket.on("gameinit", (m: any) => {
 		const obj = JSON.parse(m);
 
 		board = Object.assign(Board.empty(), obj.board);
