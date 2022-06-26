@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-export const ImageSquare = ({ data }: { data: string }) => {
+export const ImageSquare = ({ data, top, left, right, bottom }: any) => {
 	const imgRef = useRef<any>();
 
 	useEffect(() => {

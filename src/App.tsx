@@ -6,13 +6,11 @@ import { BoardScketcher } from "./Drawings/BoardSketcher";
 import { PlayerSketcher } from "./Drawings/PlayerSketcher";
 import { io } from "socket.io-client";
 import { ImageSquare } from "./Components/ImageSquare";
-import { Buffer } from "buffer";
-var dgram = require("chrome-dgram");
-var sock = dgram.createSocket("udp4");
 
 var board!: Board;
 var players!: Player[];
 var player!: Player;
+var allVideos: any = [];
 
 var socket: any = null;
 const fetchSocket = () => {
@@ -23,9 +21,6 @@ const fetchSocket = () => {
 
 function App() {
 	const [videoSocket, useVideoSocket] = useState(fetchSocket());
-	//
-
-	// io("ws://localhost:8000")
 
 	const ref = useRef<any>();
 	const videoRef = useRef<any>();
@@ -34,13 +29,17 @@ function App() {
 	var boardScketcher = new BoardScketcher();
 	var playerSketcher = new PlayerSketcher();
 
+	var getVideos = () => {
+		return videos;
+	};
+
 	videoSocket.on("connect", () => {
 		console.log("Connected to Pacwe Server");
 	});
 
 	videoSocket.on("gameaction", (m: any) => {
 		const obj = JSON.parse(m);
-		if (!board) new p5(Sketch, ref.current);
+		if (!board) new p5((p5) => Sketch(p5, videos), ref.current);
 
 		board = Object.assign(Board.empty(), obj.board);
 		players = Object.assign([], obj.players);
@@ -63,6 +62,7 @@ function App() {
 		setVideos((videos: any) => {
 			const v = { ...videos };
 			v[d.id] = d.video;
+			allVideos = v;
 			return v;
 		});
 	});
@@ -116,7 +116,7 @@ function App() {
 		}, 500);
 	}, []);
 
-	const Sketch = (p: p5) => {
+	const Sketch = (p: p5, videoPlayers: any) => {
 		p.preload = () => {};
 
 		p.setup = () => {
@@ -129,7 +129,7 @@ function App() {
 
 		p.draw = () => {
 			boardScketcher.draw(p, board);
-			playerSketcher.draw(p, players);
+			playerSketcher.draw(p, players, allVideos);
 
 			p.keyPressed = (e: any) => {
 				videoSocket.emit(
