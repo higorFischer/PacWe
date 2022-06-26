@@ -12,8 +12,8 @@ var player!: Player;
 
 function App() {
 	const [videoSocket, useVideoSocket] = useState(
-		// io("wss://pacweserver.herokuapp.com")
-		io("ws://localhost:3001")
+		io("wss://pacweserver.herokuapp.com")
+		// io("ws://localhost:3001")
 		// io("ws://localhost:8000")
 	);
 
