@@ -24,7 +24,7 @@ function App() {
 	var boardScketcher = new BoardScketcher();
 	var playerSketcher = new PlayerSketcher();
 
-	var videoSocket = io("ws://pacweserver.herokuapp.com");
+	var videoSocket = io("wss://pacweserver.herokuapp.com");
 	// var videoSocket = io("ws://localhost:3000");
 	videoSocket.connect();
 
