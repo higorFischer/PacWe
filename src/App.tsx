@@ -16,13 +16,14 @@ var player!: Player;
 
 var socket: any = null;
 const fetchSocket = () => {
-	if (!socket) socket = io("ws://localhost:3001");
+	if (!socket) socket = io("wss://pacweserver.herokuapp.com");
+	if (!socket) socket = io("wss://pacweserver.herokuapp.com");
 	return socket;
 };
 
 function App() {
 	const [videoSocket, useVideoSocket] = useState(fetchSocket());
-	// io("wss://pacweserver.herokuapp.com")
+	//
 
 	// io("ws://localhost:8000")
 
@@ -114,7 +115,7 @@ function App() {
 
 		setInterval(function () {
 			Draw(video, context);
-		}, 1000);
+		}, 500);
 	}, []);
 
 	const Sketch = (p: p5) => {
