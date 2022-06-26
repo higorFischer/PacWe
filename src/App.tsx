@@ -45,8 +45,6 @@ function App() {
 		board = Object.assign(Board.empty(), obj.board);
 		players = Object.assign([], obj.players);
 
-		console.log("updated board", board, players);
-
 		if (!player) player = Object.assign(Player.empty(), obj.self);
 	});
 
@@ -130,7 +128,6 @@ function App() {
 		};
 
 		p.draw = () => {
-			console.log(videos);
 			boardScketcher.draw(p, board);
 			playerSketcher.draw(p, players);
 
