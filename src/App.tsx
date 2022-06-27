@@ -6,6 +6,13 @@ import { BoardScketcher } from "./Drawings/BoardSketcher";
 import { PlayerSketcher } from "./Drawings/PlayerSketcher";
 import { io } from "socket.io-client";
 import { ImageSquare } from "./Components/ImageSquare";
+// import { createSocket } from "dgram"
+
+// socket = createSocket("udp4");
+
+// socket.send("msg", 41234, "0.0.0.0", () => {
+// 	console.log("OnError")
+// })
 
 var board!: Board;
 var players!: Player[];
@@ -14,7 +21,6 @@ var allVideos: any = [];
 
 var socket: any = null;
 const fetchSocket = () => {
-	if (!socket) socket = io("wss://pacweserver.herokuapp.com");
 	if (!socket) socket = io("wss://pacweserver.herokuapp.com");
 	return socket;
 };
@@ -28,10 +34,6 @@ function App() {
 	const [videos, setVideos] = useState<any>({});
 	var boardScketcher = new BoardScketcher();
 	var playerSketcher = new PlayerSketcher();
-
-	var getVideos = () => {
-		return videos;
-	};
 
 	videoSocket.on("connect", () => {
 		console.log("Connected to Pacwe Server");
